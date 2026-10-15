@@ -1,0 +1,114 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Registro de Compra</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="form-container">
+
+    <div class="tab-header">
+      <h1 class="page-title">Datos del Producto</h1>
+      <p class="page-subtitle">Ingresa la información requerida</p>
+    </div>
+
+    <form [formGroup]="compraForm" (ngSubmit)="continuarAlPago()">
+      <ion-card class="form-card">
+        <ion-card-header>
+          <div class="card-title-flex">
+            <ion-icon name="cart-outline" color="primary"></ion-icon>
+            <ion-card-title>Detalle de Compra</ion-card-title>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <!-- 1. Nombre del Producto -->
+          <div class="input-group">
+            <ion-item lines="outline" [class.ion-invalid]="nombreControl?.invalid && (nombreControl!.dirty || nombreControl!.touched)">
+              <ion-icon name="bag-check-outline" slot="start" color="primary"></ion-icon>
+              <ion-label position="stacked">Nombre del Producto <ion-text color="danger">*</ion-text></ion-label>
+              <ion-input
+                type="text"
+                placeholder="Ej. Laptop Dell XPS 15"
+                formControlName="nombreProducto"
+                clearInput="true"
+              ></ion-input>
+            </ion-item>
+            <ion-note
+              *ngIf="nombreControl?.invalid && (nombreControl!.dirty || nombreControl!.touched)"
+              color="danger"
+              class="validation-message"
+            >
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              El nombre del producto es obligatorio.
+            </ion-note>
+          </div>
+
+          <!-- 2. Cantidad -->
+          <div class="input-group">
+            <ion-item lines="outline" [class.ion-invalid]="cantidadControl?.invalid && (cantidadControl!.dirty || cantidadControl!.touched)">
+              <ion-icon name="cube-outline" slot="start" color="primary"></ion-icon>
+              <ion-label position="stacked">Cantidad <ion-text color="danger">*</ion-text></ion-label>
+              <ion-input
+                type="text"
+                min="1"
+                step="1"
+                placeholder="Ej. 2"
+                formControlName="cantidad"
+              ></ion-input>
+            </ion-item>
+            <ion-note
+              *ngIf="cantidadControl?.invalid && (cantidadControl!.dirty || cantidadControl!.touched)"
+              color="danger"
+              class="validation-message"
+            >
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              La cantidad debe ser un número entero mayor a 0.
+            </ion-note>
+          </div>
+
+          <!-- 3. Precio Unitario -->
+          <div class="input-group">
+            <ion-item lines="outline" [class.ion-invalid]="precioControl?.invalid && (precioControl!.dirty || precioControl!.touched)">
+              <ion-icon name="pricetag-outline" slot="start" color="primary"></ion-icon>
+              <ion-label position="stacked">Precio Unitario ($) <ion-text color="danger">*</ion-text></ion-label>
+              <ion-input
+                type="text"
+                min="0.01"
+                step="0.01"
+                placeholder="Ej. 450.50"
+                formControlName="precioUnitario"
+              ></ion-input>
+            </ion-item>
+            <ion-note
+              *ngIf="precioControl?.invalid && (precioControl!.dirty || precioControl!.touched)"
+              color="danger"
+              class="validation-message"
+            >
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              El precio debe ser mayor a 0.
+            </ion-note>
+          </div>
+
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Botón único de envío -->
+      <div class="actions-container">
+        <ion-button
+          expand="block"
+          type="submit"
+          shape="round"
+          size="large"
+          color="primary"
+          class="btn-submit"
+        >
+          Continuar al Pago
+          <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+        </ion-button>
+      </div>
+
+    </form>
+
+  </div>
+</ion-content>

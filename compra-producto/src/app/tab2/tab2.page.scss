@@ -1,0 +1,122 @@
+.form-container {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0.5rem 0 1.5rem 0;
+}
+
+.tab-header {
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: var(--ion-text-color, #1f1f1f);
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+    color: var(--ion-color-medium, #666);
+    margin: 0;
+  }
+}
+
+.form-card {
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+
+  .card-title-flex {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    ion-icon {
+      font-size: 1.4rem;
+    }
+
+    ion-card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+  }
+
+  ion-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+
+  ion-item {
+    --border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  .validation-message {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+    padding-left: 0.5rem;
+    margin-top: 2px;
+  }
+}
+
+.subtotal-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--ion-color-light, #f4f5f8);
+  border: 1px solid var(--ion-color-light-shade, #e0e0e0);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 0.5rem;
+
+  .subtotal-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    ion-icon {
+      font-size: 1.75rem;
+    }
+
+    .subtotal-text {
+      display: flex;
+      flex-direction: column;
+
+      .subtotal-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .subtotal-formula {
+        font-size: 0.78rem;
+        color: var(--ion-color-medium, #666);
+      }
+    }
+  }
+
+  .subtotal-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ion-color-primary, #3880ff);
+  }
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.25rem;
+
+  .btn-submit {
+    --box-shadow: 0 4px 14px rgba(56, 128, 255, 0.4);
+    font-weight: 600;
+  }
+}

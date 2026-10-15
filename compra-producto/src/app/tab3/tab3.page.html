@@ -1,0 +1,197 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Módulo de Pago</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="payment-container">
+
+    <div class="tab-header">
+      <h1 class="page-title">Liquidación y Cobro</h1>
+      <p class="page-subtitle">Aplica descuentos y calcula el cambio o saldo pendiente</p>
+    </div>
+
+    <!-- Si NO hay compra registrada en el servicio -->
+    <ion-card *ngIf="subtotal <= 0" class="empty-state-card">
+      <ion-card-content class="empty-content">
+        <ion-icon name="alert-circle-outline" color="warning" class="empty-icon"></ion-icon>
+        <h2>No hay compras pendientes</h2>
+        <p>Aún no se ha registrado ningún producto para cobrar. Ve a la pestaña de Compra para iniciar.</p>
+        <ion-button expand="block" shape="round" routerLink="/tabs/tab2" color="primary">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Ir a Registrar Producto
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Si HAY una compra activa -->
+    <div *ngIf="subtotal > 0">
+
+      <!-- 1. Tarjeta con Subtotal Recibido del Servicio -->
+      <ion-card class="subtotal-received-card">
+        <ion-card-header>
+          <div class="header-row">
+            <ion-icon name="receipt-outline" color="primary"></ion-icon>
+            <ion-card-title>Subtotal Recibido</ion-card-title>
+          </div>
+          <ion-card-subtitle *ngIf="compraService.producto() as prod">
+            Producto: <strong>{{ prod.nombreProducto }}</strong> ({{ prod.cantidad }} x ${{ prod.precioUnitario | number:'1.2-2' }})
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="amount-badge">
+            <span class="label">Subtotal de Compra:</span>
+            <span class="value">${{ subtotal | number:'1.2-2' }}</span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- 2. Formulario de Pago y Descuento -->
+      <form [formGroup]="pagoForm" (ngSubmit)="calcularPago()">
+        <ion-card class="form-card">
+          <ion-card-header>
+            <div class="header-row">
+              <ion-icon name="card-outline" color="primary"></ion-icon>
+              <ion-card-title>Detalles del Cobro</ion-card-title>
+            </div>
+            <ion-card-subtitle>Ingresa el porcentaje de descuento y el efectivo recibido</ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content>
+            <!-- Descuento % -->
+            <div class="input-group">
+              <ion-item lines="outline" [class.ion-invalid]="descuentoControl?.invalid && (descuentoControl!.dirty || descuentoControl!.touched)">
+                <ion-icon name="trending-down-outline" slot="start" color="primary"></ion-icon>
+                <ion-label position="stacked">Descuento (%)</ion-label>
+                <ion-input
+                  type="text"
+                  min="0"
+                  max="100"
+                  step="1"
+                  placeholder="0"
+                  formControlName="descuento"
+                ></ion-input>
+              </ion-item>
+              <ion-note
+                *ngIf="descuentoControl?.invalid && (descuentoControl!.dirty || descuentoControl!.touched)"
+                color="danger"
+                class="validation-message"
+              >
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                El descuento debe ser un porcentaje entre 0 y 100.
+              </ion-note>
+            </div>
+
+            <!-- Dinero Entregado -->
+            <div class="input-group">
+              <ion-item lines="outline" [class.ion-invalid]="dineroControl?.invalid && (dineroControl!.dirty || dineroControl!.touched)">
+                <ion-icon name="cash-outline" slot="start" color="primary"></ion-icon>
+                <ion-label position="stacked">Dinero Entregado ($) <ion-text color="danger">*</ion-text></ion-label>
+                <ion-input
+                  type="text"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  formControlName="dineroEntregado"
+                ></ion-input>
+              </ion-item>
+              <ion-note
+                *ngIf="dineroControl?.invalid && (dineroControl!.dirty || dineroControl!.touched)"
+                color="danger"
+                class="validation-message"
+              >
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                El dinero entregado es requerido y debe ser mayor o igual a 0.
+              </ion-note>
+            </div>
+
+            <!-- Botón Calcular -->
+            <ion-button
+              expand="block"
+              type="submit"
+              shape="round"
+              color="primary"
+              class="btn-calcular"
+            >
+              <ion-icon name="wallet-outline" slot="start"></ion-icon>
+              Calcular Pago
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </form>
+
+      <!-- 3. Tarjeta de Resumen y Cálculos (En tiempo real y al presionar Calcular) -->
+      <ion-card class="results-card">
+        <ion-card-header>
+          <div class="header-row">
+            <ion-icon name="wallet-outline" color="primary"></ion-icon>
+            <ion-card-title>Resumen de la Transacción</ion-card-title>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="summary-breakdown">
+            <div class="breakdown-row">
+              <span class="row-label">Subtotal:</span>
+              <span class="row-val">${{ subtotal | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="breakdown-row discount-row" *ngIf="montoDescuento > 0">
+              <span class="row-label">Descuento ({{ descuentoControl?.value }}%):</span>
+              <span class="row-val text-success">-${{ montoDescuento | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="breakdown-row total-row">
+              <span class="row-label">Total Final:</span>
+              <span class="row-val highlight">${{ totalFinal | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="breakdown-row">
+              <span class="row-label">Dinero Entregado:</span>
+              <span class="row-val">${{ dineroEntregado | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- ESTADO DEL PAGO: CAMBIO O SALDO PENDIENTE -->
+          <!-- Si el cliente pagó completo o más: CAMBIO (Color Success) -->
+          <div *ngIf="esPagoCompleto" class="result-banner banner-success">
+            <div class="banner-icon">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+            </div>
+            <div class="banner-text">
+              <span class="banner-title">Cambio:</span>
+              <span class="banner-amount">${{ cambio | number:'1.2-2' }}</span>
+              <span class="banner-subtitle">Pago completado satisfactoriamente</span>
+            </div>
+          </div>
+
+          <!-- Si el dinero entregado es menor al Total Final: SALDO PENDIENTE (Color Danger) -->
+          <div *ngIf="!esPagoCompleto" class="result-banner banner-danger">
+            <div class="banner-icon">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+            </div>
+            <div class="banner-text">
+              <span class="banner-title">Saldo pendiente:</span>
+              <span class="banner-amount">${{ saldoPendiente | number:'1.2-2' }}</span>
+              <span class="banner-subtitle">Falta dinero para cubrir el Total Final</span>
+            </div>
+          </div>
+
+          <!-- Botón de Nueva Compra -->
+          <div class="new-purchase-action">
+            <ion-button expand="block" fill="outline" shape="round" color="primary" (click)="nuevaCompra()">
+              <ion-icon name="refresh-outline" slot="start"></ion-icon>
+              Realizar Nueva Compra
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+    </div>
+
+  </div>
+</ion-content>
